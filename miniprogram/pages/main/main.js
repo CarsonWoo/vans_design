@@ -196,8 +196,14 @@ Page({
     }
   },
 
-  onLoadImg: function(e) {
-    console.log(e)
+  onClothesMove: function(e) {
+    this.setData({
+      isStopSwiperMove: true
+    })
+  },
+
+  stopTouchMove: function() {
+    return false
   }
 
 })
