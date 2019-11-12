@@ -16,7 +16,12 @@ Page({
   data: {
     clothes: "",
     pants: "",
-    selectedList: []
+    totalList: [],
+    selectedList: [],
+    clothesList: [],
+    pantList: [],
+    bagList: [],
+    shoeList: []
   },
 
   /**
@@ -37,59 +42,26 @@ Page({
     }).get({
       success: res => {
         console.log(res)
-        var item_list = []
-        var pants = res.data[0].img_array[0].url
-        var obj = new Object()
-        obj.type = 0
-        obj.url = "../../images/test-clothes.png"
-        for (let i = 0; i < 10; i++) {
-          if (i % 3 == 0) {
-            item_list.push(obj)
-          } else if (i % 3 == 1) {
-            item_list.push(res.data[0].img_array[1])
-          } else {
-            item_list.push(res.data[0].img_array[0])
-          }
+        let list = res.data[0].img_array
+        let itemList = []
+        for (let i = 0; i < list.length; i++) {
+          itemList.push(list[i])
         }
-        var selectedList = []
-        selectedList.splice(0, 0, obj, item_list[2])
-        // var allImages = res.data[0].img_array
+        
+        for (let type = CLOTHES; type <= BAGS; type++) {
+          this.getSpecificList(type, itemList)
+        }
 
-        // var allClothes = []
-        // var allPants = []
-        // var allBags = []
-        // var allShoes = []
-        // //todo 更换为常量
-        // for (let j = 0; j < allImages.length; j++) {
-        //   var item = allImages[j]
-        //   var url = item.url
-        //   switch (item.type) {
-        //     case CLOTHES:
-        //       allClothes.push(item)
-        //       break;
-        //     case PANTS:
-        //       allPants.push(item)
-        //       break;
-        //     case BAGS:
-        //       allBags.push(item)
-        //       break;
-        //     case SHOES:
-        //       allShoes.push(item)
-        //       break;
-        //     default:
-        //       break;
-        //   }
-        // }
+        let selectedList = []
+        // 默认先选中各自大类中的第一项
+        selectedList.splice(0, 0, this.data.clothesList[0], this.data.pantList[0])
+
         this.setData({
-          clothes: obj.url,
-          pants: pants,
-          item_list: item_list,
-          selectedList: selectedList
-          // allClothes: allClothes,
-          // allPants: allPants,
-          // allBags: allBags,
-          // allShoes: allShoes,
-          // allImages: allImages
+          clothes: selectedList[CLOTHES].url,
+          pants: selectedList[PANTS].url,
+          itemList: itemList,
+          selectedList: selectedList,
+          totalList: itemList
         })
       },
       fail: err => {
@@ -176,21 +148,56 @@ Page({
    */
   onTapClothes: function () {
     console.log("onTapClothes")
-    // this.setData({
-    //   item_list: this.data.allClothes,
-    // })
+    this.setData({
+      itemList: this.data.clothesList,
+    })
   },
   onTapPants: function () {
     console.log("onTapPants")
-    // this.setData({
-    //   item_list: this.data.allPants,
-    // })
+    this.setData({
+      itemList: this.data.pantList,
+    })
   },
   onTapBlank: function () {
     console.log("onTapBlank")
-    // this.setData({
-    //   item_list: this.data.allImages,
-    // })
+    this.setData({
+      itemList: this.data.totalList,
+    })
   },
+
+  getSpecificList: function(type, itemList) {
+    let list = []
+    for (let i = 0; i < itemList.length; i++) {
+      if (itemList[i].type == type) {
+        list.push(itemList[i])
+      }
+    }
+    switch (type) {
+      case CLOTHES:
+        this.setData({
+          clothesList: list
+        })
+        break
+      case PANTS: 
+        this.setData({
+          pantList: list
+        })
+        break
+      case BAGS:
+        this.setData({
+          bagList: list
+        })
+        break
+      case SHOES:
+        this.setData({
+          shoeList: list
+        })
+        break
+    }
+  },
+
+  onLoadImg: function(e) {
+    console.log(e)
+  }
 
 })

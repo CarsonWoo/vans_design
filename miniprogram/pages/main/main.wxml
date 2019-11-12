@@ -1,18 +1,18 @@
 <!--pages/main/main.wxml-->
 <view class="container">
   <movable-area bindtap="onTapBlank">
-    <movable-view class="movable-clothes" direction="all" x="{{(screenWidth - 300 / pixelRatio) / 2}}" y="50" catchtap="onTapClothes">
-      <image class="show-clothes" src="{{clothes}}" mode="widthFix"></image>
+    <movable-view class="movable-clothes" direction="all" x="{{(screenWidth - 300 / pixelRatio) / 2}}" y="50" scale="true">
+      <image class="show-clothes" src="{{clothes}}" mode="widthFix" catchtap="onTapClothes"></image>
     </movable-view>
 
-    <movable-view class="movable-pants" direction="all" x="{{(screenWidth - 350 / pixelRatio) / 2}}" y="120" catchtap="onTapPants">
-      <image class="show-pants" src="{{pants}}" mode="widthFix"></image>
+    <movable-view class="movable-pants" direction="all" x="{{(screenWidth - 350 / pixelRatio) / 2}}" y="120" scale="true">
+      <image class="show-pants" src="{{pants}}" mode="widthFix" catchtap="onTapPants"></image>
     </movable-view>
   </movable-area>
 
   <view class="option-panel">
-    <block wx:for="{{item_list}}">
-       <view class="option-item" style="margin-left:{{index != 0 ? 20 : 30}}rpx; margin-right:{{index != item_list.length - 1 ? 20 : 30}}rpx" catchtap="onSelectItem" data-item="{{item}}">
+    <block wx:for="{{itemList}}">
+       <view class="option-item" style="margin-left:{{index != 0 ? 20 : 30}}rpx; margin-right:{{index != itemList.length - 1 ? 20 : 30}}rpx" catchtap="onSelectItem" data-item="{{item}}">
          <image src="{{item.url}}"></image>
        </view>
     </block>
