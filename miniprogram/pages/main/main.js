@@ -1,8 +1,14 @@
 // pages/main/main.js
+/**
+  * type定义 0：衣服 1：裤子 2：鞋子 3：包包
+  * 这里以type为index 记录入数组selectedList 这里js的Map数据结构好像有点问题 导致无法setValue 故沿用list
+  */
+const CLOTHES = 0
+const PANTS = 1
+const SHOES = 2
+const BAGS = 3
 Page({
-  /**
-   * type定义 0：衣服 1：裤子 2：鞋子 3：包包
-   */
+
 
   /**
    * 页面的初始数据
@@ -10,16 +16,7 @@ Page({
   data: {
     clothes: "",
     pants: "",
-    CLOTHES: 0,
-    PANTS: 1,
-    SHOES: 2,
-    BAGS: 3,
-    selectedList: [],
-    allImages: [],
-    allPants: [],
-    allClothes: [],
-    allShoes: [],
-    allBags: [],
+    selectedList: []
   },
 
   /**
@@ -54,44 +51,45 @@ Page({
             item_list.push(res.data[0].img_array[0])
           }
         }
-        var allImages = res.data[0].img_array
-
-        var allClothes = []
-        var allPants = []
-        var allBags = []
-        var allShoes = []
-        //todo 更换为常量
-        for (let j = 0; j < allImages.length; j++) {
-          var item = allImages[j]
-          var url = item.url
-          switch (item.type) {
-            case this.data.CLOTHES:
-              allClothes.push(item)
-              break;
-            case this.data.PANTS:
-              allPants.push(item)
-              break;
-            case this.data.BAGS:
-              allBags.push(item)
-              break;
-            case this.data.SHOES:
-              allShoes.push(item)
-              break;
-            default:
-              break;
-          }
-        }
         var selectedList = []
-        selectedList.push(obj, pants)
+        selectedList.splice(0, 0, obj, item_list[2])
+        // var allImages = res.data[0].img_array
+
+        // var allClothes = []
+        // var allPants = []
+        // var allBags = []
+        // var allShoes = []
+        // //todo 更换为常量
+        // for (let j = 0; j < allImages.length; j++) {
+        //   var item = allImages[j]
+        //   var url = item.url
+        //   switch (item.type) {
+        //     case CLOTHES:
+        //       allClothes.push(item)
+        //       break;
+        //     case PANTS:
+        //       allPants.push(item)
+        //       break;
+        //     case BAGS:
+        //       allBags.push(item)
+        //       break;
+        //     case SHOES:
+        //       allShoes.push(item)
+        //       break;
+        //     default:
+        //       break;
+        //   }
+        // }
         this.setData({
           clothes: obj.url,
           pants: pants,
           item_list: item_list,
-          allClothes: allClothes,
-          allPants: allPants,
-          allBags: allBags,
-          allShoes: allShoes,
-          allImages: allImages
+          selectedList: selectedList
+          // allClothes: allClothes,
+          // allPants: allPants,
+          // allBags: allBags,
+          // allShoes: allShoes,
+          // allImages: allImages
         })
       },
       fail: err => {
@@ -152,37 +150,47 @@ Page({
   /**
    * 以下为自定义函数
    */
-  
-  stopPageScroll: function() {},
 
-  onSelectItem: function(e) {
-    console.log(e)
-    var selected = e.currentTarget.dataset.item
-    this.setData({
-      clothes: selected.url
-    })
+  stopPageScroll: function () { },
+
+  onSelectItem: function (e) {
+    let selected = e.currentTarget.dataset.item
+    let selectedList = this.data.selectedList
+    for (let idx in selectedList) {
+      let item = selectedList[idx]
+      if (item.type == selected.type) {
+        // 替换该类商品
+        selectedList.splice(selected.type, 1, selected)
+        this.setData({
+          clothes: selectedList[CLOTHES].url,
+          pants: selectedList[PANTS].url,
+          selectedList: selectedList
+        })
+        break
+      }
+    }
   },
 
   /**
    * 顶部区域衣服、裤子和空白区域的点击
    */
-  onTapClothes: function() {
+  onTapClothes: function () {
     console.log("onTapClothes")
-    this.setData({
-      item_list: this.data.allClothes,
-    })
+    // this.setData({
+    //   item_list: this.data.allClothes,
+    // })
   },
-  onTapPants: function() {
+  onTapPants: function () {
     console.log("onTapPants")
-    this.setData({
-      item_list: this.data.allPants,
-    })
+    // this.setData({
+    //   item_list: this.data.allPants,
+    // })
   },
-  onTapBlank: function() {
+  onTapBlank: function () {
     console.log("onTapBlank")
-    this.setData({
-      item_list: this.data.allImages,
-    })
+    // this.setData({
+    //   item_list: this.data.allImages,
+    // })
   },
 
 })
