@@ -1,24 +1,24 @@
 <!--pages/main/main.wxml-->
 <view class="container">
   <swiper class="wardrobe" circular="true" catchtouchmove="{{isStopSwiperMove ? 'stopTouchove' : ''}}">
-    <swiper-item class="a-set-clothes">
+    <swiper-item class="a-set-clothes" wx:for="{{wardrobeList}}" wx:key="item">
       <view class="movable-container">
         <movable-area bindtap="onTapBlank">
           <!-- 衣服 -->
-          <movable-view class="movable-clothes" direction="all" x="{{(screenWidth - 300 / pixelRatio) / 2}}" y="50" scale="true" catchtouchmove="onClothesMove">
-            <image class="show-clothes" src="{{clothes}}" mode="widthFix" catchtap="onTapDisplay" data-type="0"></image>
+          <movable-view class="movable-clothes" direction="all" x="{{(screenWidth - 350 / pixelRatio) / 2}}" y="50" scale="true" catchtouchmove="onClothesMove">
+            <image class="show-display" src="{{item[0].url}}" mode="widthFix" catchtap="onTapDisplay" data-type="0"></image>
           </movable-view>
           <!-- 裤子 -->
-          <movable-view class="movable-pants" direction="all" x="{{(screenWidth - 350 / pixelRatio) / 2}}" y="120" scale="true" catchtouchmove="onClothesMove">
-            <image class="show-pants" src="{{pants}}" mode="widthFix" catchtap="onTapDisplay" data-type="1"></image>
+          <movable-view class="movable-pants" direction="all" x="{{(screenWidth - 320 / pixelRatio) / 2}}" y="120" scale="true" catchtouchmove="onClothesMove">
+            <image class="show-display" src="{{item[1].url}}" mode="widthFix" catchtap="onTapDisplay" data-type="1"></image>
           </movable-view>
           <!-- 鞋子 -->
-          <movable-view class="movable-pants" direction="all" x="{{(screenWidth - 350 / pixelRatio) / 2}}" y="230" scale="true" catchtouchmove="onClothesMove">
-            <image class="show-clothes" src="{{shoes}}" mode="widthFix" catchtap="onTapDisplay" data-type="2"></image>
+          <movable-view class="movable-shoes" direction="all" x="{{(screenWidth - 280 / pixelRatio) / 2}}" y="230" scale="true" catchtouchmove="onClothesMove">
+            <image class="show-display" src="{{item[2].url}}" mode="widthFix" catchtap="onTapDisplay" data-type="2"></image>
           </movable-view>
           <!-- 包包 -->
-          <movable-view class="movable-pants" direction="all" x="{{screenWidth - 60}}" y="60" scale="true" catchtouchmove="onClothesMove">
-            <image class="show-pants" src="{{bags}}" mode="widthFix" catchtap="onTapDisplay" data-type="3"></image>
+          <movable-view class="movable-bags" direction="all" x="{{screenWidth - 80}}" y="120" scale="true" catchtouchmove="onClothesMove" wx:if="{{bagList.length != 0}}">
+            <image class="show-display" src="{{item[3].url}}" mode="widthFix" catchtap="onTapDisplay" data-type="3"></image>
           </movable-view>
         </movable-area>
       </view>
@@ -27,11 +27,15 @@
 
   <view class="stage"></view>
 
-  <view class="option-panel" animation="{{optionPanelAnimation}}">
-    <block wx:for="{{itemList}}">
+  <view class="option-panel" animation="{{optionPanelAnimation}}" wx:if="{{isShowPanel}}">
+    <block wx:for="{{itemList}}" wx:key="item">
       <view class="option-item" style="margin-left:{{index != 0 ? 20 : 30}}rpx; margin-right:{{index != itemList.length - 1 ? 20 : 30}}rpx" catchtap="onSelectItem" data-item="{{item}}">
         <image src="{{item.url}}"></image>
       </view>
     </block>
   </view>
+</view>
+
+<view class="guide-view" wx:if="{{needGuide}}">
+  <view style="width: 100%" animation="{{guideAnimation}}">←→左右滑动可切换哦~</view>
 </view>

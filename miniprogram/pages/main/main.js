@@ -22,7 +22,9 @@ Page({
     pantList: [],
     bagList: [],
     shoeList: [],
-    isShowPanel: false
+    isShowPanel: false,
+    currentTab: 0,
+    wardrobeList: []
   },
 
   /**
@@ -97,7 +99,7 @@ Page({
 
   initAnimation: function() {
     let anim = wx.createAnimation()
-    anim.bottom(-200).opacity(0).step()
+    anim.translateY(200).opacity(0).step()
     this.setData({
       optionPanelAnimation: anim.export()
     })
@@ -123,6 +125,7 @@ Page({
         let selectedList = []
         // 默认先选中各自大类中的第一项
         selectedList.splice(0, 0, this.data.clothesList[0], this.data.pantList[0], this.data.shoeList[0], this.data.bagList[0])
+        
 
         this.setData({
           clothes: selectedList[CLOTHES].url,
@@ -138,6 +141,58 @@ Page({
         console.log(err)
       }
     })
+
+    db.collection("clothes").field({
+      recommend_list: true
+    }).get({
+      success: res => {
+        console.log(res)
+        this.setData({
+          wardrobeList: res.data[0].recommend_list
+        })
+      },
+      fail: err => {
+
+      }
+    })
+
+    this.loadGuideAnimation()
+  },
+
+  loadGuideAnimation: function() {
+    let needGuide = false
+    try {
+      needGuide = wx.getStorageSync("needGuide")
+      if (needGuide) {
+        needGuide = needGuide
+      }
+    } catch (e) {
+      wx.setStorageSync("needGuide", true)
+      needGuide = true
+    }
+    console.log(needGuide)
+    this.setData({
+      needGuide: needGuide
+    })
+    if (needGuide) {
+      wx.setStorageSync("needGuide", false)
+      let anim = wx.createAnimation()
+      anim.translateX(0).translateX(-50).step({ druation: 1000 })
+      anim.translateX(0).step({ duration: 500})
+      anim.translateX(50).step({druation: 500})
+      anim.translateX(0).step({ duration: 500})
+      let timer = setInterval(() => {
+        this.setData({
+          guideAnimation: anim.export()
+        })
+      }, 1000)
+      setTimeout(() => {
+        clearInterval(timer)
+        this.setData({
+          needGuide: false
+        })
+      }, 4000)
+    }
   },
 
   loadOptionPanelAnimation: function(show) {
@@ -150,18 +205,18 @@ Page({
     }
     let anim = wx.createAnimation(option)
     if (show) {
-      anim.bottom(-200).opacity(0.1).step()
+      anim.translateY(200).opacity(0.1).step()
     } else {
-      anim.bottom(0).opacity(1).step()
+      anim.translateY(0).opacity(1).step()
     }
     this.setData({
       optionPanelAnimation: anim.export()
     })
     setTimeout(() => {
       if (show) {
-        anim.bottom(0).opacity(1).step()
+        anim.translateY(0).opacity(1).step()
       } else {
-        anim.bottom(-200).opacity(0.1).step()
+        anim.translateY(200).opacity(0.1).step()
       }
       this.setData({
         optionPanelAnimation: anim.export()
@@ -227,10 +282,12 @@ Page({
   onTapBlank: function () {
     console.log("onTapBlank")
     this.loadOptionPanelAnimation(false)
-    this.setData({
-      itemList: this.data.totalList,
-      isShowPanel: false
-    })
+    setTimeout(() => {
+      this.setData({
+        itemList: this.data.totalList,
+        isShowPanel: false
+      })
+    }, 500)
   },
 
   getSpecificList: function(type, itemList) {
