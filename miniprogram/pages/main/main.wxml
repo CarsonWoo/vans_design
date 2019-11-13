@@ -4,19 +4,30 @@
     <swiper-item class="a-set-clothes">
       <view class="movable-container">
         <movable-area bindtap="onTapBlank">
+          <!-- 衣服 -->
           <movable-view class="movable-clothes" direction="all" x="{{(screenWidth - 300 / pixelRatio) / 2}}" y="50" scale="true" catchtouchmove="onClothesMove">
-            <image class="show-clothes" src="{{clothes}}" mode="widthFix" catchtap="onTapClothes"></image>
+            <image class="show-clothes" src="{{clothes}}" mode="widthFix" catchtap="onTapDisplay" data-type="0"></image>
           </movable-view>
-
+          <!-- 裤子 -->
           <movable-view class="movable-pants" direction="all" x="{{(screenWidth - 350 / pixelRatio) / 2}}" y="120" scale="true" catchtouchmove="onClothesMove">
-            <image class="show-pants" src="{{pants}}" mode="widthFix" catchtap="onTapPants"></image>
+            <image class="show-pants" src="{{pants}}" mode="widthFix" catchtap="onTapDisplay" data-type="1"></image>
+          </movable-view>
+          <!-- 鞋子 -->
+          <movable-view class="movable-pants" direction="all" x="{{(screenWidth - 350 / pixelRatio) / 2}}" y="230" scale="true" catchtouchmove="onClothesMove">
+            <image class="show-clothes" src="{{shoes}}" mode="widthFix" catchtap="onTapDisplay" data-type="2"></image>
+          </movable-view>
+          <!-- 包包 -->
+          <movable-view class="movable-pants" direction="all" x="{{screenWidth - 60}}" y="60" scale="true" catchtouchmove="onClothesMove">
+            <image class="show-pants" src="{{bags}}" mode="widthFix" catchtap="onTapDisplay" data-type="3"></image>
           </movable-view>
         </movable-area>
       </view>
     </swiper-item>
   </swiper>
 
-  <view class="option-panel">
+  <view class="stage"></view>
+
+  <view class="option-panel" animation="{{optionPanelAnimation}}">
     <block wx:for="{{itemList}}">
       <view class="option-item" style="margin-left:{{index != 0 ? 20 : 30}}rpx; margin-right:{{index != itemList.length - 1 ? 20 : 30}}rpx" catchtap="onSelectItem" data-item="{{item}}">
         <image src="{{item.url}}"></image>

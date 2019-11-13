@@ -21,7 +21,8 @@ Page({
     clothesList: [],
     pantList: [],
     bagList: [],
-    shoeList: []
+    shoeList: [],
+    isShowPanel: false
   },
 
   /**
@@ -36,38 +37,9 @@ Page({
         })
       }
     })
-    const db = wx.cloud.database()
-    db.collection("clothes").field({
-      img_array: true
-    }).get({
-      success: res => {
-        console.log(res)
-        let list = res.data[0].img_array
-        let itemList = []
-        for (let i = 0; i < list.length; i++) {
-          itemList.push(list[i])
-        }
-        
-        for (let type = CLOTHES; type <= BAGS; type++) {
-          this.getSpecificList(type, itemList)
-        }
-
-        let selectedList = []
-        // 默认先选中各自大类中的第一项
-        selectedList.splice(0, 0, this.data.clothesList[0], this.data.pantList[0])
-
-        this.setData({
-          clothes: selectedList[CLOTHES].url,
-          pants: selectedList[PANTS].url,
-          itemList: itemList,
-          selectedList: selectedList,
-          totalList: itemList
-        })
-      },
-      fail: err => {
-        console.log(err)
-      }
-    })
+    this.loadDataFromDB()
+    this.initAnimation()
+    // this.loadAnimation()
   },
 
   /**
@@ -81,7 +53,7 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-
+     
   },
 
   /**
@@ -123,6 +95,80 @@ Page({
    * 以下为自定义函数
    */
 
+  initAnimation: function() {
+    let anim = wx.createAnimation()
+    anim.bottom(-200).opacity(0).step()
+    this.setData({
+      optionPanelAnimation: anim.export()
+    })
+  },
+
+  loadDataFromDB: function() {
+    const db = wx.cloud.database()
+    db.collection("clothes").field({
+      img_array: true
+    }).get({
+      success: res => {
+        console.log(res)
+        let list = res.data[0].img_array
+        let itemList = []
+        for (let i = 0; i < list.length; i++) {
+          itemList.push(list[i])
+        }
+
+        for (let type = CLOTHES; type <= BAGS; type++) {
+          this.getSpecificList(type, itemList)
+        }
+
+        let selectedList = []
+        // 默认先选中各自大类中的第一项
+        selectedList.splice(0, 0, this.data.clothesList[0], this.data.pantList[0], this.data.shoeList[0], this.data.bagList[0])
+
+        this.setData({
+          clothes: selectedList[CLOTHES].url,
+          pants: selectedList[PANTS].url,
+          shoes: selectedList[SHOES].url,
+          bags: selectedList[BAGS].url,
+          itemList: itemList,
+          selectedList: selectedList,
+          totalList: itemList
+        })
+      },
+      fail: err => {
+        console.log(err)
+      }
+    })
+  },
+
+  loadOptionPanelAnimation: function(show) {
+    if (show == this.data.isShowPanel) {
+      return
+    }
+    let option = {
+      duration: 500,
+      timingFunction: 'ease'
+    }
+    let anim = wx.createAnimation(option)
+    if (show) {
+      anim.bottom(-200).opacity(0.1).step()
+    } else {
+      anim.bottom(0).opacity(1).step()
+    }
+    this.setData({
+      optionPanelAnimation: anim.export()
+    })
+    setTimeout(() => {
+      if (show) {
+        anim.bottom(0).opacity(1).step()
+      } else {
+        anim.bottom(-200).opacity(0.1).step()
+      }
+      this.setData({
+        optionPanelAnimation: anim.export()
+      })
+    })
+  },
+
   stopPageScroll: function () { },
 
   onSelectItem: function (e) {
@@ -136,6 +182,8 @@ Page({
         this.setData({
           clothes: selectedList[CLOTHES].url,
           pants: selectedList[PANTS].url,
+          shoes: selectedList[SHOES].url,
+          bags: selectedList[BAGS].url,
           selectedList: selectedList
         })
         break
@@ -146,22 +194,42 @@ Page({
   /**
    * 顶部区域衣服、裤子和空白区域的点击
    */
-  onTapClothes: function () {
-    console.log("onTapClothes")
+  onTapDisplay: function (e) {
+    let type = parseInt(e.currentTarget.dataset.type)
+    console.log(type)
+    this.loadOptionPanelAnimation(true)
+    switch(type) {
+      case CLOTHES:
+        this.setData({
+          itemList: this.data.clothesList
+        })
+        break
+      case PANTS: 
+        this.setData({
+          itemList: this.data.pantList
+        })
+        break
+      case SHOES:
+        this.setData({
+          itemList: this.data.shoeList
+        })
+        break
+      case BAGS: 
+        this.setData({
+          itemList: this.data.bagList
+        })
+        break
+    }
     this.setData({
-      itemList: this.data.clothesList,
-    })
-  },
-  onTapPants: function () {
-    console.log("onTapPants")
-    this.setData({
-      itemList: this.data.pantList,
+      isShowPanel: true
     })
   },
   onTapBlank: function () {
     console.log("onTapBlank")
+    this.loadOptionPanelAnimation(false)
     this.setData({
       itemList: this.data.totalList,
+      isShowPanel: false
     })
   },
 
@@ -183,14 +251,14 @@ Page({
           pantList: list
         })
         break
-      case BAGS:
-        this.setData({
-          bagList: list
-        })
-        break
       case SHOES:
         this.setData({
           shoeList: list
+        })
+        break
+      case BAGS:
+        this.setData({
+          bagList: list
         })
         break
     }
