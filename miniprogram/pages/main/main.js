@@ -23,7 +23,7 @@ Page({
     bagList: [],
     shoeList: [],
     isShowPanel: false,
-    currentTab: 0,
+    curIndex: 0,
     wardrobeList: []
   },
 
@@ -122,18 +122,8 @@ Page({
           this.getSpecificList(type, itemList)
         }
 
-        let selectedList = []
-        // 默认先选中各自大类中的第一项
-        selectedList.splice(0, 0, this.data.clothesList[0], this.data.pantList[0], this.data.shoeList[0], this.data.bagList[0])
-        
-
         this.setData({
-          clothes: selectedList[CLOTHES].url,
-          pants: selectedList[PANTS].url,
-          shoes: selectedList[SHOES].url,
-          bags: selectedList[BAGS].url,
           itemList: itemList,
-          selectedList: selectedList,
           totalList: itemList
         })
       },
@@ -160,39 +150,36 @@ Page({
   },
 
   loadGuideAnimation: function() {
-    let needGuide = false
-    try {
-      needGuide = wx.getStorageSync("needGuide")
-      if (needGuide) {
-        needGuide = needGuide
-      }
-    } catch (e) {
-      wx.setStorageSync("needGuide", true)
-      needGuide = true
-    }
-    console.log(needGuide)
-    this.setData({
-      needGuide: needGuide
+    wx.getStorage({
+      key: 'hasGuided',
+      success: (res) => {
+        console.log(res)
+        let needGuide = !res.data
+        console.log(needGuide)
+        this.setData({
+          needGuide: needGuide
+        })
+        if (needGuide) {
+          wx.setStorageSync("hasGuided", true)
+          let anim = wx.createAnimation()
+          anim.translateX(0).translateX(-50).step({ druation: 1000 })
+          anim.translateX(0).step({ duration: 500 })
+          anim.translateX(50).step({ druation: 500 })
+          anim.translateX(0).step({ duration: 500 })
+          let timer = setInterval(() => {
+            this.setData({
+              guideAnimation: anim.export()
+            })
+          }, 1000)
+          setTimeout(() => {
+            clearInterval(timer)
+            this.setData({
+              needGuide: false
+            })
+          }, 4000)
+        }
+      },
     })
-    if (needGuide) {
-      wx.setStorageSync("needGuide", false)
-      let anim = wx.createAnimation()
-      anim.translateX(0).translateX(-50).step({ druation: 1000 })
-      anim.translateX(0).step({ duration: 500})
-      anim.translateX(50).step({druation: 500})
-      anim.translateX(0).step({ duration: 500})
-      let timer = setInterval(() => {
-        this.setData({
-          guideAnimation: anim.export()
-        })
-      }, 1000)
-      setTimeout(() => {
-        clearInterval(timer)
-        this.setData({
-          needGuide: false
-        })
-      }, 4000)
-    }
   },
 
   loadOptionPanelAnimation: function(show) {
@@ -228,22 +215,21 @@ Page({
 
   onSelectItem: function (e) {
     let selected = e.currentTarget.dataset.item
-    let selectedList = this.data.selectedList
-    for (let idx in selectedList) {
-      let item = selectedList[idx]
+    let wardrobeList = this.data.wardrobeList
+    let curIndex = this.data.curIndex
+    let currentRecommendList = wardrobeList[curIndex]
+    for (let idx in currentRecommendList) {
+      let item = currentRecommendList[idx]
       if (item.type == selected.type) {
         // 替换该类商品
-        selectedList.splice(selected.type, 1, selected)
-        this.setData({
-          clothes: selectedList[CLOTHES].url,
-          pants: selectedList[PANTS].url,
-          shoes: selectedList[SHOES].url,
-          bags: selectedList[BAGS].url,
-          selectedList: selectedList
-        })
+        currentRecommendList.splice(selected.type, 1, selected)
+        wardrobeList.splice(curIndex, 1, currentRecommendList)
         break
       }
     }
+    this.setData({
+      wardrobeList: wardrobeList
+    })
   },
 
   /**
@@ -329,6 +315,13 @@ Page({
 
   stopTouchMove: function() {
     return false
+  },
+
+  onSwiperChange: function(e) {
+    console.log(e)
+    this.setData({
+      curIndex: e.detail.current
+    })
   }
 
 })

@@ -1,6 +1,6 @@
 <!--pages/main/main.wxml-->
 <view class="container">
-  <swiper class="wardrobe" circular="true" catchtouchmove="{{isStopSwiperMove ? 'stopTouchove' : ''}}">
+  <swiper class="wardrobe" catchtouchmove="{{isStopSwiperMove ? 'stopTouchove' : ''}}" bindchange="onSwiperChange">
     <swiper-item class="a-set-clothes" wx:for="{{wardrobeList}}" wx:key="item">
       <view class="movable-container">
         <movable-area bindtap="onTapBlank">
