@@ -24,7 +24,8 @@ Page({
     shoeList: [],
     isShowPanel: false,
     curIndex: 0,
-    wardrobeList: []
+    wardrobeList: [],
+    showCurtain: true
   },
 
   /**
@@ -41,7 +42,6 @@ Page({
     })
     this.loadDataFromDB()
     this.initAnimation()
-    // this.loadAnimation()
   },
 
   /**
@@ -55,7 +55,9 @@ Page({
    * 生命周期函数--监听页面显示
    */
   onShow: function () {
-     
+    setTimeout(() => {
+      this.loadCurtainAnimation()
+    }, 2000)
   },
 
   /**
@@ -105,6 +107,24 @@ Page({
     })
   },
 
+  loadCurtainAnimation: function() {
+    let anim = wx.createAnimation({
+      duration: 3000,
+      timingFunction: 'ease-in-out'
+    })
+    anim.translateY(-3000).step()
+    this.setData({
+      curtainAnimation: anim.export()
+    })
+    setTimeout(() => {
+      this.setData({
+        showCurtain: false
+      })
+      // 帘幕上拉消失后再展示引导动画
+      this.loadGuideAnimation()
+    }, 2500)
+  },
+
   loadDataFromDB: function() {
     const db = wx.cloud.database()
     db.collection("clothes").field({
@@ -145,8 +165,6 @@ Page({
 
       }
     })
-
-    this.loadGuideAnimation()
   },
 
   loadGuideAnimation: function() {
@@ -160,7 +178,10 @@ Page({
           needGuide: needGuide
         })
         if (needGuide) {
-          wx.setStorageSync("hasGuided", true)
+          wx.setStorage({
+            key: 'hasGuided',
+            data: true,
+          })
           let anim = wx.createAnimation()
           anim.translateX(0).translateX(-50).step({ druation: 1000 })
           anim.translateX(0).step({ duration: 500 })
@@ -174,11 +195,22 @@ Page({
           setTimeout(() => {
             clearInterval(timer)
             this.setData({
-              needGuide: false
+              needGuide: false,
+              showArrow: true
             })
           }, 4000)
+        } else {
+          console.log("no need guide")
+          this.setData({
+            showArrow: true
+          })
         }
       },
+      fail: err => {
+        console.log(err)
+        wx.setStorageSync("hasGuided", false)
+        this.loadGuideAnimation()
+      }
     })
   },
 
@@ -322,6 +354,26 @@ Page({
     this.setData({
       curIndex: e.detail.current
     })
+  },
+
+  onSlide: function(e) {
+    let gesture = e.currentTarget.dataset.gesture
+    console.log(gesture)
+    let idx = this.data.curIndex
+    console.log(idx)
+    if (gesture == "left" && idx > 0) {
+      idx = idx - 1
+      this.setData({
+        curIndex: idx
+      })
+      console.log("slide left")
+    } else if (gesture == "right" && idx < this.data.wardrobeList.length - 1) {
+      idx = idx + 1
+      this.setData({
+        curIndex: idx
+      })
+      console.log("slide right")
+    }
   }
 
 })

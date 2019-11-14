@@ -97,7 +97,7 @@ movable-area {
 }
 
 .guide-view {
-  font-size: 30rpx;
+  font-size: 28rpx;
   text-align: center;
   color: white;
   background-color: rgba(0, 0, 0, 0.74);
@@ -111,4 +111,41 @@ movable-area {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+}
+
+.guide-view image {
+  width: 250rpx;
+  margin-bottom: 50rpx;
+}
+
+.curtain {
+  width: 100%;
+  height: 80%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+.curtain image {
+  width: 100%;
+}
+
+.slide-arrow {
+  width: 100rpx;
+  z-index: 9999;
+}
+
+.left {
+  position: fixed;
+  left: 50rpx;
+  top: 40%;
+  margin-top: -25rpx;
+}
+
+.right {
+  position: fixed;
+  right: 50rpx;
+  top: 40%;
+  margin-top: -25rpx;
 }
